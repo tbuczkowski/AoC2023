@@ -33,8 +33,7 @@ final RegExp gameIdParser = RegExp(r'Game (\d+):');
   return (gameId, parsedHands);
 }
 
-void main(List<String> arguments) {
-  final List<String> input = loadInputData(arguments.first);
+void part1(List<String> input) {
   for (String game in input) {
     final (int, List<(int, int, int)>) parsedGame = parseGame(game);
     bool validGame = true;
@@ -51,6 +50,31 @@ void main(List<String> arguments) {
     }
   }
   print(validGames);
+}
+
+void main(List<String> arguments) {
+  final List<String> input = loadInputData(arguments.first);
+  int sum = 0;
+  for (String game in input) {
+    final (int, List<(int, int, int)>) parsedGame = parseGame(game);
+    int minRed = 0;
+    int minGreen = 0;
+    int minBlue = 0;
+    for ((int, int, int) hand in parsedGame.$2) {
+      if (hand.$1 > minRed) {
+        minRed = hand.$1;
+      }
+      if (hand.$2 > minGreen) {
+        minGreen = hand.$2;
+      }
+      if (hand.$3 > minBlue) {
+        minBlue = hand.$3;
+      }
+    }
+    final int power = minRed * minGreen * minBlue;
+    sum += power;
+  }
+  print(sum);
 }
 
 List<String> loadInputData(String filename) {
