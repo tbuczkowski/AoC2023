@@ -1,7 +1,16 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:collection/collection.dart';
+
+class SeedRange {
+  final int start;
+  final int length;
+
+  SeedRange({
+    required this.start,
+    required this.length,
+  });
+}
 
 class MapRecord {
   final int source;
@@ -24,12 +33,15 @@ class MapRecord {
   int convert(int number) => number + (destination - source);
 }
 
-late final List<int> seeds;
+final List<SeedRange> seedRanges = [];
 final List<List<MapRecord>> maps = [];
 
 void parseInput(List<String> lines) {
   final String seedsStr = lines.first.split(': ').last;
-  seeds = seedsStr.split(' ').map((String number) => int.parse(number)).toList();
+  final List<int> seeds = seedsStr.split(' ').map((String number) => int.parse(number)).toList();
+  for (int i = 0; i < seeds.length; i += 2) {
+    seedRanges.add(SeedRange(start: seeds[i], length: seeds[i + 1]));
+  }
   lines.removeAt(0);
   lines.removeAt(0);
   int currentMapIndex = 0;
@@ -52,16 +64,22 @@ void parseInput(List<String> lines) {
 void main(List<String> arguments) {
   final List<String> lines = loadInputData(arguments.first);
   parseInput(lines);
-  final List<int> locations = [];
-  for (int seed in seeds) {
-    int currentNumber = seed;
-    for (List<MapRecord> map in maps) {
-      final MapRecord? fittingRecord = map.firstWhereOrNull((MapRecord record) => record.fitsThisRecord(currentNumber));
-      currentNumber = fittingRecord?.convert(currentNumber) ?? currentNumber;
+  int minLocation = 999999999999;
+  for (SeedRange seedRange in seedRanges) {
+    print('processing seed range ${seedRange.start}');
+    for (int i = 0; i < seedRange.length; i++) {
+      int currentNumber = seedRange.start + i;
+      for (List<MapRecord> map in maps) {
+        final MapRecord? fittingRecord =
+            map.firstWhereOrNull((MapRecord record) => record.fitsThisRecord(currentNumber));
+        currentNumber = fittingRecord?.convert(currentNumber) ?? currentNumber;
+      }
+      if (currentNumber < minLocation) {
+        minLocation = currentNumber;
+      }
     }
-    locations.add(currentNumber);
   }
-  print(locations.reduce(min));
+  print(minLocation);
 }
 
 List<String> loadInputData(String filename) {
