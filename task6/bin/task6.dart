@@ -13,25 +13,18 @@ int simulateRace(int time, int distanceToBeat) {
 
 void main(List<String> arguments) {
   final [String timesStr, String distancesStr] = loadInputData(arguments.first);
-  final List<int> times = timesStr
-      .split(RegExp(r'Time:\s'))
-      .last
-      .split(' ')
-      .where((String number) => number.isNotEmpty)
-      .map((String number) => int.parse(number))
-      .toList();
-  final List<int> distances = distancesStr
-      .split(RegExp(r'Distance:\s'))
-      .last
-      .split(' ')
-      .where((String number) => number.isNotEmpty)
-      .map((String number) => int.parse(number))
-      .toList();
-  int result = 1;
-  for (int i = 0; i < times.length; i++) {
-    result *= simulateRace(times[i], distances[i]);
-  }
-  print(result);
+  final List<String> times =
+      timesStr.split(RegExp(r'Time:\s')).last.split(' ').where((String number) => number.isNotEmpty).toList();
+  final List<String> distances =
+      distancesStr.split(RegExp(r'Distance:\s')).last.split(' ').where((String number) => number.isNotEmpty).toList();
+  // int result = 1;
+  // for (int i = 0; i < times.length; i++) {
+  //   result *= simulateRace(times[i], distances[i]);
+  // }
+  // print(result);
+  final int combinedTime = int.parse(times.reduce((value, element) => value + element));
+  final int combinedDistance = int.parse(distances.reduce((value, element) => value + element));
+  print(simulateRace(combinedTime, combinedDistance));
 }
 
 List<String> loadInputData(String filename) {
