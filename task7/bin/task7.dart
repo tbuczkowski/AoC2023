@@ -77,7 +77,7 @@ Hand parseHand(String line) {
             '8' => 6,
             '9' => 7,
             'T' => 8,
-            'J' => 9,
+            'J' => -1,
             'Q' => 10,
             'K' => 11,
             'A' => 12,
@@ -89,7 +89,13 @@ Hand parseHand(String line) {
     int currentCount = cardCounts[individualCard]!;
     cardCounts[individualCard] = currentCount + 1;
   }
+  final int jCount = cardCounts.remove(-1) ?? 0;
   final List<int> countedCards = cardCounts.values.toList()..sort();
+  if (countedCards.isNotEmpty) {
+    countedCards[countedCards.length - 1] += jCount;
+  } else {
+    countedCards.add(jCount);
+  }
   // print(countedCards);
   return switch (countedCards) {
     [1, 1, 1, 1, 1] => HighCard(cards: individualCards, bid: bid),
