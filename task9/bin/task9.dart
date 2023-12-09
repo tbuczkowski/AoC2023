@@ -14,13 +14,13 @@ int processSequence(List<int> sequence) {
     if (i == differentials.length - 1) {
       differentials[i].add(0);
     } else {
-      differentials[i].add(differentials[i].last + differentials[i + 1].last);
+      differentials[i].insert(0, differentials[i].first - differentials[i + 1].first);
     }
   }
   // print(sequence);
   // print(differentials);
-  // print(sequence.last + differentials.first.last);
-  return sequence.last + differentials.first.last;
+  // print(sequence.first - differentials.first.first);
+  return sequence.first - differentials.first.first;
 }
 
 void main(List<String> arguments) {
