@@ -7,9 +7,28 @@ int computeAxis(List<String> axis) {
   for (int i = 1; i < axis.length; i++) {
     int currentValue = 0;
     final int maxOffset = min(i, axis.length - i);
+    bool hadDifference = false;
     for (int j = 0; j < maxOffset; j++) {
-      final bool matchFound = axis[i + j] == axis[i - j - 1];
+      final String line1 = axis[i + j];
+      final String line2 = axis[i - j - 1];
+      final bool matchFound = line1 == line2;
       if (matchFound) {
+        currentValue++;
+        continue;
+      }
+      int diff = 0;
+      for (int k = 0; k < line1.length; k++) {
+        if (line1[k] == line2[k]) {
+          continue;
+        }
+        diff++;
+        if (diff > 1) {
+          break;
+        }
+      }
+      if (diff == 1) {
+        hadDifference = true;
+        // print((i, j, axis));
         currentValue++;
         continue;
       }
@@ -18,7 +37,7 @@ int computeAxis(List<String> axis) {
     if (currentValue < maxOffset) {
       continue;
     }
-    if (currentValue > maxValue) {
+    if (hadDifference && currentValue > maxValue) {
       maxValue = currentValue;
       index = i;
     }
@@ -31,6 +50,7 @@ int computeValue(List<String> horizontal, List<String> vertical) {
   // print(vertical);
   final int horizontalValue = computeAxis(horizontal);
   final int verticalValue = computeAxis(vertical);
+  // print((horizontalValue, verticalValue));
   return verticalValue > horizontalValue ? verticalValue : horizontalValue * 100;
 }
 
@@ -55,7 +75,7 @@ void main(List<String> arguments) async {
       }
 
       final int val = computeValue(horizontal, vertical);
-      print(val);
+      // print(val);
       sum += val;
       horizontal = [];
       vertical = [];
