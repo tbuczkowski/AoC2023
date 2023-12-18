@@ -42,44 +42,78 @@ void main(List<String> arguments) async {
   int minY = 0;
   int maxX = 0;
   int maxY = 0;
+  int outline = 0;
   for (String line in lines) {
-    final [String direction, String distanceStr, String colorStr] = line.split(' ');
-    final int distance = int.parse(distanceStr);
+    final String colorStr = line.split(' ').last;
+    final String parsed = colorStr.substring(2, colorStr.length - 1);
+    final String distanceStr = parsed.substring(0, parsed.length - 1);
+    final String direction = switch (parsed.split('').last) {
+      '0' => 'R',
+      '1' => 'D',
+      '2' => 'L',
+      '3' => 'U',
+      _ => throw 'hhh',
+    };
+    int distance = int.parse("0x$distanceStr");
+    // final [String direction, String distanceStr, String colorStr] = line.split(' ');
+    // final int distance = int.parse(distanceStr);
+    outline += distance;
     final Color color = colorStr.toColor();
-    for (int i = 0; i < distance; i++) {
-      currentCoords = switch (direction) {
-        'R' => (x: currentCoords.x + 1, y: currentCoords.y),
-        'L' => (x: currentCoords.x - 1, y: currentCoords.y),
-        'U' => (x: currentCoords.x, y: currentCoords.y - 1),
-        'D' => (x: currentCoords.x, y: currentCoords.y + 1),
-        _ => throw 'Error',
-      };
-      nodes[currentCoords] = color;
-    }
-    if (currentCoords.x < minX) {
-      minX = currentCoords.x;
-    }
-    if (currentCoords.y < minY) {
-      minY = currentCoords.y;
-    }
-    if (currentCoords.x > maxX) {
-      maxX = currentCoords.x;
-    }
-    if (currentCoords.y > maxY) {
-      maxY = currentCoords.y;
-    }
+    nodes[currentCoords] = color;
+    currentCoords = switch (direction) {
+      'R' => (x: currentCoords.x + distance, y: currentCoords.y),
+      'L' => (x: currentCoords.x - distance, y: currentCoords.y),
+      'U' => (x: currentCoords.x, y: currentCoords.y - distance),
+      'D' => (x: currentCoords.x, y: currentCoords.y + distance),
+      _ => throw 'Error',
+    };
+    // for (int i = 0; i < distance; i++) {
+    //   currentCoords = switch (direction) {
+    //     'R' => (x: currentCoords.x + 1, y: currentCoords.y),
+    //     'L' => (x: currentCoords.x - 1, y: currentCoords.y),
+    //     'U' => (x: currentCoords.x, y: currentCoords.y - 1),
+    //     'D' => (x: currentCoords.x, y: currentCoords.y + 1),
+    //     _ => throw 'Error',
+    //   };
+    //   nodes[currentCoords] = color;
+    // }
+    // if (currentCoords.x < minX) {
+    //   minX = currentCoords.x;
+    // }
+    // if (currentCoords.y < minY) {
+    //   minY = currentCoords.y;
+    // }
+    // if (currentCoords.x > maxX) {
+    //   maxX = currentCoords.x;
+    // }
+    // if (currentCoords.y > maxY) {
+    //   maxY = currentCoords.y;
+    // }
   }
-  final Map<Coords, Color> processedNodes =
-      nodes.map((key, value) => MapEntry((x: key.x + minX.abs(), y: key.y + minY.abs()), value));
-  List<List<Color?>> grid = List.generate(
-      maxY + minY.abs() + 1, (y) => List.generate(maxX + minX.abs() + 1, (x) => processedNodes[(x: x, y: y)]));
-  grid = floodFill(grid, (x: 100, y: 55));
-  final int count = grid.fold<int>(
-      0, (int sum, List<Color?> line) => sum + line.fold(0, (int sum, Color? color) => sum + (color == null ? 0 : 1)));
-  for (List<Color?> line in grid) {
-    print(line.fold<String>("", (String str, element) => str + (element == null ? '.' : '#')));
+  final List<Coords> keys = nodes.keys.toList();
+  int positive = 0;
+  int negative = 0;
+  // print(keys);
+  for (int i = 0; i < keys.length; i++) {
+    positive += keys[i].x * keys[(i + 1) % keys.length].y;
+    negative += keys[(i + 1) % keys.length].x * keys[i].y;
   }
-  print(count);
+  // print(positive);
+  // print(negative);
+  print(((positive - negative).abs() / 2) + outline / 2 + 1);
+  // int sum = sum.abs() ~/ 2;
+  // print(sum);
+  // final Map<Coords, Color> processedNodes =
+  //     nodes.map((key, value) => MapEntry((x: key.x + minX.abs(), y: key.y + minY.abs()), value));
+  // List<List<Color?>> grid = List.generate(
+  //     maxY + minY.abs() + 1, (y) => List.generate(maxX + minX.abs() + 1, (x) => processedNodes[(x: x, y: y)]));
+  // // grid = floodFill(grid, (x: 100, y: 55));
+  // final int count = grid.fold<int>(
+  //     0, (int sum, List<Color?> line) => sum + line.fold(0, (int sum, Color? color) => sum + (color == null ? 0 : 1)));
+  // for (List<Color?> line in grid) {
+  //   print(line.fold<String>("", (String str, element) => str + (element == null ? '.' : '#')));
+  // }
+  // print(count);
 }
 
 List<String> loadInputData(String filename) {
