@@ -99,18 +99,21 @@ void main(List<String> arguments) async {
       nodes[output]?.registerInput(node.key);
     }
   }
-  for (int i = 0; i < 1000; i++) {
+  for (int i = 0; i < 999999999; i++) {
     lowPulses++;
     pulsePropagationQueue.add(('entrypoint', 'broadcaster', false));
     while (pulsePropagationQueue.isNotEmpty) {
       final (String source, String destination, bool pulse) = pulsePropagationQueue.removeFirst();
-      // print((source, destination, pulse));
+      // if (destination == 'rx') {
+      //   print((source, destination, pulse));
+      //   print(i);
+      // }
+      if (destination == 'vf' && pulse) {
+        print((source, destination, pulse, i));
+      }
       nodes[destination]?.handlePulse(source, pulse);
     }
   }
-  print(lowPulses);
-  print(highPulses);
-  print(lowPulses * highPulses);
 }
 
 List<String> loadInputData(String filename) {
